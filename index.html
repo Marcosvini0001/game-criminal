@@ -1,0 +1,108 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>Sombras no Escritório – Jogo de Detetive</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#120d09;--p:#d9c49a;--ink:#2b1d10;--y:#f2b84b;--r:#b3261e;--fs:16px;color-scheme:dark}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:radial-gradient(#2a1d12,#0d0906);color:var(--p);font:var(--fs)/1.5 'Special Elite','Courier New',monospace}
+h1,h2,h3{font-family:'Playfair Display',Georgia,serif;margin:.3em 0;color:var(--y)}
+header{display:flex;flex-wrap:wrap;gap:6px;padding:8px;align-items:center;justify-content:center}
+header h1{font-size:1.1em;width:100%;text-align:center;margin:0}
+button,select,textarea{font:inherit;color:inherit}
+.b{background:#2a1d12;border:1px solid var(--y);color:var(--y);padding:6px 10px;cursor:pointer;border-radius:3px}
+.b:hover,.b:focus-visible{background:var(--y);color:#120d09;outline:none}.b.on{background:var(--y);color:#120d09}
+#cena{position:relative;width:min(100%,900px);margin:6px auto;aspect-ratio:5/3;container-type:inline-size;border:2px solid #4a3620;overflow:hidden}
+#cena svg{position:absolute;inset:0;width:100%;height:100%}
+#cena.lz::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),transparent 12%,rgba(0,0,0,.85) 30%);pointer-events:none}
+.h{position:absolute;transform:translate(-50%,-50%);width:max(36px,6.5cqw);height:max(36px,6.5cqw);font-size:max(20px,4cqw);background:rgba(242,184,75,.06);border:1px dashed transparent;border-radius:50%;cursor:zoom-in;padding:0;z-index:2}
+.h:hover,.h:focus-visible{border-color:var(--y);background:rgba(242,184,75,.25);outline:none}
+#st{text-align:center;font-size:.85em;opacity:.8}
+#m{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:9;padding:10px}
+#m.o{display:flex}
+.p{background:var(--p);color:var(--ink);max-width:640px;width:100%;max-height:90vh;overflow:auto;padding:16px 18px;border-radius:2px;box-shadow:0 0 30px #000;animation:sl .35s}
+.p h2,.p h3{color:#5a1612}.p select,.p textarea{background:#efe3c4;color:var(--ink);border:1px solid #8a7447;width:100%;margin:2px 0 6px}
+.p .b{background:#4a3620;color:#f2dba8}.p .b:hover{background:var(--r)}
+@keyframes sl{from{transform:translateY(-30px);opacity:0}}
+.z{font-size:4em;text-align:center}.card{border-left:4px solid var(--r);padding-left:8px;margin:8px 0}
+.stamp{font-family:'Playfair Display',serif;font-size:2em;color:var(--r);border:4px solid var(--r);display:inline-block;padding:2px 12px;transform:rotate(-8deg);animation:st .5s}
+@keyframes st{from{transform:rotate(-8deg) scale(3);opacity:0}}
+.tag{font-size:.75em;background:#4a3620;color:#f2dba8;padding:1px 6px;border-radius:8px}
+</style></head><body>
+<header><h1>🔎 SOMBRAS NO ESCRITÓRIO</h1>
+<button class="b" onclick="dossie()">Dossiê</button><button class="b" onclick="caderno()">Caderno</button><button class="b" onclick="interr()">Interrogar</button><button class="b" id="bl" onclick="lant()">🔦 Lanterna</button><button class="b" onclick="dica()">Dica</button><button class="b" onclick="acusar()">Acusar</button><button class="b" onclick="fonte()" aria-label="Aumentar fonte">A+</button><button class="b" onclick="ajuda()">?</button></header>
+<div id="cena" role="group" aria-label="Cena do crime"></div><div id="st"></div><div id="m" role="dialog" aria-modal="true"></div>
+
+<!-- CASO: edite/duplique este bloco JSON para criar novos casos (veja o botão «?») -->
+<script type="application/json" id="caso">
+{"id":"001","titulo":"Sombras no Escritório","dificuldade":"Média",
+"ficha":{"vitima":"Heitor Valença, 58 anos, contador e sócio da Valença & Andrade Contabilidade. Metódico, reservado, respeitado.","local":"Escritório da Valença & Andrade, 3º andar, Rua da Aurora, 214","dataHora":"12/03/1954 – encontrado às 22:10; morte estimada entre 21:00 e 22:00","tipo":"Homicídio (sem sinais de luta)","descricao":"O vigia encontrou o escritório com a luz acesa e a vítima caída ao lado da mesa. Nada de aparente arrombamento. A equipe isolou o local e demarcou o contorno com giz.",
+"linhaDoTempo":["18:00 – Expediente termina; funcionários saem","20:00 – ??? (Clara declara ter saído)","20:30 – Heitor liga para casa dizendo que ficaria até tarde","21:?? – ???","22:10 – Vigia encontra Heitor"],
+"testemunhas":["Seu Zé, vigia: «A catraca estava com defeito, mas o estacionamento registra a entrada de carros.»","Dona Lúcia, vizinha: «Ouvi passos de salto no corredor, tarde da noite.»"]},
+"suspeitos":[
+{"id":"clara","av":"👩‍💼","nome":"Clara Andrade","relacao":"Sócia de Heitor","alibi":"Saiu às 20h e jantou no restaurante Veneza até as 22h30.","personalidade":"Elegante, calculista, fala pouco.","pergs":[["Onde estava às 21h?","No Veneza, jantando. Perguntem ao garçom... se ele lembrar."],["Como era sua relação com Heitor?","Profissional. Sócios há doze anos."]],
+"pistas":{"recibo":"!O recibo mostra seu carro entrando às 21h12... Eu... devo ter passado para pegar uma pasta. Só um minuto!","agenda":"!Reunião às 21h marcada com você? Ele nunca me avisou! ...Ou melhor, esqueci de mencionar.","livro":"!Aquilo é erro de lançamento. Heitor adorava complicar as coisas.","celular":"!Ele me escreveu isso? Não li. Não vi mesmo.","cofre":"!Só sócios conhecem a combinação. Mas isso não prova nada!","pegada":"!Número 37... Metade das mulheres da cidade calça 37."}},
+{"id":"rogerio","av":"🧑‍🎤","nome":"Rogério Valença","relacao":"Sobrinho, estudante","alibi":"Estava em casa jogando videogame online.","personalidade":"Impulsivo, simpático, sempre sem dinheiro.","pergs":[["Onde estava às 21h?","Em casa, online. Os servidores têm meu registro."],["Pediu dinheiro ao seu tio?","Pedi. Ele me deu semana passada."]],"pistas":{"bilhete":"Aquele bilhete é antigo! Ele já transferiu o valor, tenho o comprovante.","janela":"Nunca subiria 3 andares por uma janela!"}},
+{"id":"marta","av":"👵","nome":"Marta Sobral","relacao":"Secretária","alibi":"Foi para casa às 18h e dormiu cedo.","personalidade":"Leal, nervosa, detalhista.","pergs":[["Onde estava às 21h?","Dormindo. Moro sozinha, ninguém me viu."],["Viu algo estranho nos últimos dias?","O doutor Heitor andava preocupado com os livros."]],"pistas":{"mancha":"Fui eu! Derramei café pela manhã e esqueci de limpar direito.","bilhete":"Aquele bilhete do Rogério? Está na mesa desde terça."}},
+{"id":"otavio","av":"🕴️","nome":"Otávio Brandão","relacao":"Cliente descontente","alibi":"Em um bar com amigos até meia-noite.","personalidade":"Grosseiro, fuma charuto, esquentado.","pergs":[["Onde estava às 21h?","No Bar do Chico, meia dúzia de testemunhas."],["Brigou com Heitor?","Reclamei de honorários à tarde. Só isso."]],"pistas":{"isqueiro":"Esqueci à tarde, quando fui reclamar. Pergunte ao vigia."}}],
+"cena":{"elementos":[
+{"id":"recibo","t":"verdadeira","i":"🧾","x":10,"y":80,"nome":"Recibo na lixeira","d":"Ticket do estacionamento do prédio: entrada às 21:12, placa final -7C4. A placa é de um sedã prata."},
+{"id":"agenda","t":"verdadeira","i":"📔","x":56,"y":60,"nome":"Agenda de Heitor","d":"Anotação de hoje: «21h – C.A. – conversar sobre auditoria». Nenhuma outra reunião após as 18h."},
+{"id":"pegada","t":"verdadeira","i":"👣","x":52,"y":90,"req":"lanterna","nome":"Pegada sob luz","d":"Com a lanterna surge uma pegada de sapato feminino, salto fino, tamanho 37, perto da mesa."},
+{"id":"livro","t":"verdadeira","i":"📒","x":40,"y":73,"req":"gaveta","nome":"Livro-caixa","d":"Páginas com rasuras: R$ 180 mil desviados em seis meses para uma conta que não é da empresa. Letra de Heitor na margem: «Quem fez isso?»"},
+{"id":"celular","t":"verdadeira","i":"📱","x":50,"y":73,"req":"gaveta","nome":"Celular de Heitor","d":"Rascunho não enviado: «Clara, descobri os desvios. Amanhã falo com a auditoria. Vamos conversar antes.»"},
+{"id":"cofre","t":"verdadeira","i":"🔐","x":71,"y":32,"req":"quadro","nome":"Cofre aberto","d":"Aberto sem arrombar, vazio. A combinação é a data de fundação da sociedade, que só os sócios conhecem."},
+{"id":"isqueiro","t":"falsa","i":"🚬","x":44,"y":60,"nome":"Isqueiro de Otávio","d":"Isqueiro com as iniciais O.B. sobre a mesa. Cheira a charuto."},
+{"id":"bilhete","t":"falsa","i":"📝","x":50,"y":60,"nome":"Bilhete de Rogério","d":"«Tio, preciso urgente de R$ 5.000, senão perco a faculdade. R.» Escrito há dias."},
+{"id":"mancha","t":"falsa","i":"☕","x":72,"y":84,"nome":"Mancha escura","d":"Mancha escura no tapete, de aparência suspeita. Cheira a café."},
+{"id":"janela","t":"falsa","i":"🪟","x":91,"y":28,"nome":"Janela entreaberta","d":"Janela entreaberta, parece rota de fuga. Está emperrada há semanas e dá para a fachada do 3º andar."},
+{"id":"gaveta","t":"neutra","i":"🗄️","x":45,"y":70,"rev":"gaveta","nome":"Gaveta da mesa","d":"Você abre a gaveta e encontra documentos escondidos no fundo. Há novos itens na mesa."},
+{"id":"quadro","t":"neutra","i":"🖼️","x":71,"y":22,"rev":"quadro","nome":"Quadro na parede","d":"Você vira o quadro: há algo atrás dele."},
+{"id":"planta","t":"neutra","i":"🪴","x":94,"y":72,"nome":"Planta","d":"Vaso de samambaia murcha."},
+{"id":"relogio","t":"neutra","i":"🕰️","x":50,"y":10,"nome":"Relógio de parede","d":"Parado às 4h, sem pilha. Nunca funcionou direito."},
+{"id":"lamp","t":"neutra","i":"💡","x":38,"y":60,"nome":"Luminária","d":"Luminária de latão acesa, lâmpada amarelada."},
+{"id":"estante","t":"neutra","i":"📚","x":21,"y":25,"nome":"Estante","d":"Códigos tributários e balanços antigos."},
+{"id":"copo","t":"neutra","i":"🥛","x":66,"y":60,"nome":"Copo","d":"Copo d'água pela metade."},
+{"id":"tel","t":"neutra","i":"☎️","x":62,"y":60,"nome":"Telefone fixo","d":"Telefone preto de disco. Sem tom."},
+{"id":"cal","t":"neutra","i":"📅","x":34,"y":16,"nome":"Calendário","d":"Calendário de uma padaria, março."},
+{"id":"casaco","t":"neutra","i":"🧥","x":6,"y":45,"nome":"Casaco no cabide","d":"Sobretudo velho de Heitor. Bolsos vazios."}]},
+"motivos":["Esconder o desvio de dinheiro descoberto pela vítima","Herdar o patrimônio de Heitor","Vingança por honorários abusivos","Dívida de jogo"],
+"dicas":["Nem tudo que parece suspeito é culpa. Procure o que contradiz um álibi.","Abra gavetas, vire quadros e use a lanterna no chão.","Compare o horário do recibo com o álibi de Clara."],
+"solucao":{"culpado":"clara","motivo":0,"prova":"recibo","reconstituicao":"Clara desviou R$ 180 mil da empresa. Heitor descobriu e marcou conversa às 21h. Ela voltou escondida, entrou no prédio às 21h12 (recibo), abriu o cofre que só os sócios conheciam e silenciou Heitor antes que ele chamasse a auditoria. O jantar no Veneza foi só álibi. Otávio, Rogério e Marta tinham explicações inocentes para cada pista."}}
+</script>
+<script>
+const C=JSON.parse(document.getElementById('caso').textContent),$=id=>document.getElementById(id),K='detetive'+C.id;
+const E=id=>C.cena.elementos.find(e=>e.id==id),Sx=id=>C.suspeitos.find(s=>s.id==id);
+let S={f:[],m:{},n:{},rv:[],ct:[],er:0,h:0,t:Date.now(),L:0,end:null};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){}
+const sv=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const M=h=>{$('m').innerHTML='<div class="p">'+h+'<p><button class="b" onclick="X()">Fechar</button></p></div>';$('m').classList.add('o');$('m').querySelector('.b:last-child').focus()};
+const X=()=>{$('m').classList.remove('o');draw()};
+document.addEventListener('keydown',e=>{if(e.key=='Escape')X()});
+function draw(){
+const hs=C.cena.elementos.filter(e=>!e.req||(e.req=='lanterna'?S.L:S.rv.includes(e.req)));
+$('cena').innerHTML=`<svg viewBox="0 0 100 60" preserveAspectRatio="none" role="img" aria-label="Escritório com mesa, estante, janela e contorno de giz no chão"><rect width="100" height="60" fill="#33261a"/><polygon points="0,42 100,42 100,60 0,60" fill="#1a130d"/><rect x="85" y="9" width="12" height="20" fill="#16222e" stroke="#6b4e2e"/><rect x="66" y="8" width="11" height="17" fill="#4d1e1a" stroke="#c9a14a" stroke-width=".6"/><rect x="12" y="8" width="16" height="22" fill="#241a10" stroke="#6b4e2e"/><rect x="32" y="34" width="36" height="10" fill="#4a3220" stroke="#8a6a3c"/><rect x="34" y="44" width="3" height="10" fill="#4a3220"/><rect x="63" y="44" width="3" height="10" fill="#4a3220"/><ellipse cx="38" cy="53" rx="9" ry="2.6" fill="none" stroke="#ddd" stroke-width=".5" stroke-dasharray="1.4 1"/><circle cx="29" cy="52" r="1.3" fill="none" stroke="#ddd" stroke-width=".5"/><ellipse cx="36" cy="33" rx="14" ry="5" fill="#f2b84b" opacity=".08"/></svg>`+
+hs.map(e=>`<button class="h" style="left:${e.x}%;top:${e.y}%" data-i="${e.id}" aria-label="Examinar: ${e.nome}">${e.i}</button>`).join('');
+$('cena').querySelectorAll('.h').forEach(b=>b.onclick=()=>exam(b.dataset.i));
+$('cena').classList.toggle('lz',!!S.L);$('bl').classList.toggle('on',!!S.L);
+$('st').textContent=`Pistas: ${S.f.length} · Acusações erradas: ${S.er}/2 · Dicas: ${S.h}/3`}
+$('cena').addEventListener('pointermove',e=>{const r=$('cena').getBoundingClientRect();$('cena').style.setProperty('--mx',(e.clientX-r.left)/r.width*100+'%');$('cena').style.setProperty('--my',(e.clientY-r.top)/r.height*100+'%')});
+function lant(){S.L=S.L?0:1;sv();draw()}
+function exam(id){const e=E(id);if(!S.f.includes(id))S.f.push(id);if(e.rev&&!S.rv.includes(e.rev))S.rv.push(e.rev);sv();
+M(`<div class="z">${e.i}</div><h2>${e.nome}</h2><p>${e.d}</p><p class="tag">Anotado no caderno</p>`)}
+function dossie(){const f=C.ficha;M(`<h2>📁 CASO Nº ${C.id} <span class="stamp" style="font-size:.5em">CONFIDENCIAL</span></h2><p><b>Tipo:</b> ${f.tipo}<br><b>Local:</b> ${f.local}<br><b>Data/hora:</b> ${f.dataHora}</p><h3>Vítima</h3><p>${f.vitima}</p><h3>Ocorrido</h3><p>${f.descricao}</p><h3>Suspeitos</h3>${C.suspeitos.map(s=>`<div class="card"><b>${s.av} ${s.nome}</b> – ${s.relacao}<br>Álibi: ${s.alibi}<br><i>${s.personalidade}</i></div>`).join('')}<h3>Linha do tempo</h3><ul>${f.linhaDoTempo.map(x=>`<li>${x}</li>`).join('')}</ul><h3>Testemunhas</h3>${f.testemunhas.map(x=>`<p>${x}</p>`).join('')}`)}
+function caderno(){M('<h2>📓 Caderno do detetive</h2>'+(S.f.length?S.f.map(id=>{const e=E(id);return `<div class="card"><b>${e.i} ${e.nome}</b><br>${e.d}<select aria-label="Marcar ${e.nome}" onchange="S.m['${id}']=this.value;sv()">${['','Relevante','Descartada','Dúvida'].map(o=>`<option ${S.m[id]==o?'selected':''}>${o}</option>`).join('')}</select><textarea rows="2" placeholder="Suas anotações" aria-label="Anotações" oninput="S.n['${id}']=this.value;sv()">${S.n[id]||''}</textarea></div>`}).join(''):'<p>Nada ainda. Examine a cena.</p>'))}
+function interr(){M('<h2>Interrogatório</h2>'+C.suspeitos.map(s=>`<button class="b" onclick="susp('${s.id}')">${s.av} ${s.nome}</button> `).join(''))}
+function susp(id){const s=Sx(id);M(`<h2>${s.av} ${s.nome}</h2><p>${s.alibi}</p><div id="lg"></div>${s.pergs.map((p,i)=>`<button class="b" onclick="lg('${p[0]}','${p[1].replace(/'/g,"\\'")}')">${p[0]}</button> `).join('')}<h3>Apresentar pista</h3><select id="ps">${S.f.map(f=>`<option value="${f}">${E(f).nome}</option>`).join('')}</select><button class="b" onclick="pres('${id}')">Apresentar</button> <button class="b" onclick="interr()">← Voltar</button>`)}
+function lg(q,a){$('lg').insertAdjacentHTML('beforeend',`<p><b>Você:</b> ${q}<br><b>Resposta:</b> ${a}</p>`)}
+function pres(id){const p=$('ps').value;if(!p)return;let r=Sx(id).pistas[p],c=0;if(r&&r[0]=='!'){c=1;r=r.slice(1);if(!S.ct.includes(id+p)){S.ct.push(id+p);sv()}}lg('(apresenta: '+E(p).nome+')',r||'Não sei do que está falando, detetive.');if(c)$('lg').insertAdjacentHTML('beforeend','<p class="tag">⚡ Contradição descoberta!</p>')}
+function dica(){if(S.h>=3)return M('<p>Suas dicas acabaram.</p>');M(`<h3>Dica ${S.h+1}/3 (−15 pts)</h3><p>${C.dicas[S.h]}</p>`);S.h++;sv()}
+function acusar(){if(S.end)return fim();M(`<h2>⚖️ Acusação final</h2><p>Erros: ${S.er}/2</p>Culpado<select id="ac">${C.suspeitos.map(s=>`<option value="${s.id}">${s.nome}</option>`).join('')}</select>Motivo<select id="am">${C.motivos.map((m,i)=>`<option value="${i}">${m}</option>`).join('')}</select>Prova principal<select id="ap">${S.f.map(f=>`<option value="${f}">${E(f).nome}</option>`).join('')}</select><button class="b" onclick="enviar()">Acusar</button>`)}
+function enviar(){const s=C.solucao;if($('ac').value==s.culpado&&+$('am').value==s.motivo&&$('ap').value==s.prova)S.end='RESOLVIDO';else{S.er++;if(S.er>=2)S.end='ARQUIVADO';else{sv();return M('<h3>❌ Combinação incorreta</h3><p>Reveja as provas e tente de novo.</p>')}}sv();fim()}
+function fim(){const T=C.cena.elementos.filter(e=>e.t=='verdadeira'),F=C.cena.elementos.filter(e=>e.t=='falsa'),ok=S.end=='RESOLVIDO',min=Math.round((Date.now()-S.t)/6e4);
+let p=T.filter(e=>S.f.includes(e.id)).length*10+F.filter(e=>S.m[e.id]=='Descartada').length*5+S.ct.length*15+(ok?100+Math.max(0,60-min):0)-S.er*20-S.h*15;p=Math.max(0,p);
+const r=!ok?'Caso arquivado':p>=220?'Inspetor-Chefe':p>=150?'Investigador':'Detetive Novato',miss=T.filter(e=>!S.f.includes(e.id));
+M(`<div class="stamp">${S.end}</div><h2>${r} – ${p} pts</h2><p>Tempo: ${min} min · Contradições: ${S.ct.length}</p><h3>O que realmente aconteceu</h3><p>${C.solucao.reconstituicao}</p>${miss.length?`<h3>Pistas que passaram</h3><ul>${miss.map(e=>`<li>${e.nome}</li>`).join('')}</ul>`:''}<button class="b" onclick="try{localStorage.removeItem(K)}catch(e){};location.reload()">Jogar de novo</button>`)}
+function fonte(){const v=document.documentElement.style;v.setProperty('--fs',(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--fs'))>=22?16:+parseInt(getComputedStyle(document.documentElement).getPropertyValue('--fs'))+3)+'px')}
+function ajuda(){M(`<h2>Como jogar</h2><p>Toque nos ícones da cena. Abra gavetas, vire quadros e use a 🔦 para revelar pistas. Marque as pistas no caderno, interrogue apresentando provas e acuse o culpado (máx. 2 erros).</p><h3>Criar um novo caso</h3><p>Edite o bloco <code>&lt;script id="caso"&gt;</code> mantendo as chaves: <b>ficha</b>, <b>suspeitos</b> (pistas: «!» no início = contradição), <b>cena.elementos</b> (t: verdadeira|falsa|neutra; x,y em %; req: id de outro elemento ou «lanterna»; rev: libera elementos), <b>motivos</b>, <b>dicas</b>, <b>solucao</b> (culpado, índice do motivo, id da prova). Cada falsa deve ter explicação no interrogatório.</p>`)}
+draw();if(S.end)fim();else if(!S.f.length)dossie();
+</script></body></html>
